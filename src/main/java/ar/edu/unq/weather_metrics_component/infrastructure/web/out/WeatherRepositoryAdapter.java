@@ -4,6 +4,7 @@ import ar.edu.unq.weather_metrics_component.domain.model.TemperatureReport;
 import ar.edu.unq.weather_metrics_component.domain.port.out.WeatherRepositoryPort;
 import ar.edu.unq.weather_metrics_component.infrastructure.web.out.dto.PeriodOfTimeTemperatureReportDto;
 import ar.edu.unq.weather_metrics_component.infrastructure.web.out.dto.TemperatureReportDto;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
+@Slf4j
 @Component
 public class WeatherRepositoryAdapter implements WeatherRepositoryPort {
 
@@ -41,6 +43,8 @@ public class WeatherRepositoryAdapter implements WeatherRepositoryPort {
                 .build()
                 .toUri();
 
+        log.info("Weather Loader Component URI: {}.", UriSanitizerUtil.sanitize(weatherLoaderComponentUri));
+
         TemperatureReportDto temperatureReportDto =
                 Objects.requireNonNull(restClient.get().uri(weatherLoaderComponentUri).retrieve().body(TemperatureReportDto.class));
 
@@ -61,8 +65,10 @@ public class WeatherRepositoryAdapter implements WeatherRepositoryPort {
                 .build()
                 .toUri();
 
-         PeriodOfTimeTemperatureReportDto periodOfTimeTemperatureReportDto =
-                 Objects.requireNonNull(restClient.get().uri(weatherLoaderComponentUri).retrieve().body(PeriodOfTimeTemperatureReportDto.class));
+        log.info("Weather Loader Component URI: {}.", UriSanitizerUtil.sanitize(weatherLoaderComponentUri));
+
+        PeriodOfTimeTemperatureReportDto periodOfTimeTemperatureReportDto =
+                Objects.requireNonNull(restClient.get().uri(weatherLoaderComponentUri).retrieve().body(PeriodOfTimeTemperatureReportDto.class));
 
         return periodOfTimeTemperatureReportDto.getTemperatureReports().stream()
                 .map(this::generateTemperatureReportFrom)
