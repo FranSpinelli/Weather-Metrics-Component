@@ -69,6 +69,13 @@
             <version>7.4</version>
         </dependency>
 
+        <!-- Para Spring Cache -->
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>

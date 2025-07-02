@@ -5,6 +5,7 @@ import ar.edu.unq.weather_metrics_component.domain.port.out.WeatherRepositoryPor
 import ar.edu.unq.weather_metrics_component.infrastructure.web.out.dto.PeriodOfTimeTemperatureReportDto;
 import ar.edu.unq.weather_metrics_component.infrastructure.web.out.dto.TemperatureReportDto;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -32,6 +33,7 @@ public class WeatherRepositoryAdapter implements WeatherRepositoryPort {
     }
 
     @Override
+    @Cacheable(value = "currentTemperatureReportsCache", key = "T(java.time.LocalDateTime).now().truncatedTo(T(java.time.temporal.ChronoUnit).MINUTES).toString()")
     public TemperatureReport getCurrentTemperatureReport() {
 
         URI weatherLoaderComponentUri = UriComponentsBuilder.newInstance()
@@ -52,6 +54,12 @@ public class WeatherRepositoryAdapter implements WeatherRepositoryPort {
     }
 
     @Override
+    @Cacheable(
+            value = "PeriodTemperatureReportsCache",
+            key = "#localDateTimeYesterday.truncatedTo(T(java.time.temporal.ChronoUnit).MINUTES).toString()" +
+                    "+ '-' +" +
+                    "#localDateTimeNow.truncatedTo(T(java.time.temporal.ChronoUnit).MINUTES).toString()"
+    )
     public List<TemperatureReport> getTemperatureReportsFromPeriod(LocalDateTime localDateTimeYesterday, LocalDateTime localDateTimeNow) {
 
         URI weatherLoaderComponentUri = UriComponentsBuilder.newInstance()
